@@ -1,5 +1,6 @@
 const Admin_col = require('../server/models/admin.js');
-const Food_col = require('./models/food.js');
+const Food = require('./models/food.js');
+const Inventory = require('./models/inventory.js');
 const Notification_col = require('../server/models/notification.js');
 const MC_employees = require('../server/models/microchip_employees.js');
 
@@ -35,7 +36,7 @@ module.exports = function(app){
     });
     app.get('/counter', function(req, res){
         if(req.cookies.admin){
-            Food_col.find({},(err,foods)=>{
+            Food.find({},(err,foods)=>{
                 res.render("counter",{foods:foods});
 
             })
@@ -57,12 +58,15 @@ module.exports = function(app){
         
 
 
-                 Food_col.find({},(err,foods)=>{
+                 Food.find({},(err,foods)=>{
                     Notification_col.find({to:'admin'},(err,notifications)=>{
                         MC_employees.find({},(err,mc_employees)=>{
+                            Inventory.find({},(err,inventorys)=>{
+                                
                                 res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
-                                res.render("admin/index",{foods:foods,notifications:notifications,mc_employees:mc_employees});
+                                res.render("admin/index",{foods:foods,notifications:notifications,mc_employees:mc_employees,inventorys:inventorys});
 
+                            })
                            
 
                         });
@@ -143,7 +147,7 @@ module.exports = function(app){
                    
                 })
             })
-           new Food_col(food_obj).save((err,food)=>{
+           new Food(food_obj).save((err,food)=>{
             console.log("food:",food);   
             res.redirect('/admin');
            })
@@ -168,6 +172,25 @@ module.exports = function(app){
     
     })
  });
+ app.post('/admin/add_inventory',(req,res)=>{
+    let name = req.body.name;
+    let value = req.body.value;
+            Inventory.findOne({name:name},(err,inventory,resp)=>{
+            if(err){throw err};
+            const old_value = inventory.value;
+            inventory.value = parseInt(old_value) + parseInt(value);
+            inventory.save((err2,inventory_)=>{
+                if(err2){throw err2};
+                res.json({success:true,inventory:inventory_});
+                res.end();
+            })
+           
+          
+        });
+     
+
+    
+ })
  app.post('/admin/settings',(req,res)=>{
     let pwd_old = req.body.pwd_old;
     let pwd_new = req.body.pwd_new;

@@ -19,32 +19,28 @@
         <i class="fa fa-bars fa-2x toggle-btn" data-toggle="collapse" data-target="#menu-content"></i>
         <div class="menu-list">
             <ul id="menu-content" class="menu-content collapse out">
-                
-            <li  onClick="navigate('employees_div')">
-            <a>
-                <i class="fas fa-users"></i>Employees
+            <li >
+            <a href='/counter'>
+                <i class="fas fa-user-tie"></i> Counter 
             </a>
         </li>
-        <li onClick="navigate('add_employees_div')">
-        <a >
-            <i class="fas fa-user-tie"></i> Add Employees 
+        <li  onClick="navigate('inventory_div')">
+        <a>
+            <i class="fas fa-users"></i>Raw Material Inventory
         </a>
-        </li>
+    </li>
+    <li onClick="navigate('food_div')">
+    <a >
+        <i class="fas fa-user-tie"></i> All Available Foods 
+    </a>
+    </li> 
         <li onClick="navigate('add_food_div')">
         <a >
             <i class="fas fa-user-tie"></i> Add Food 
         </a>
         </li>
-        <li onClick="navigate('food_div')">
-        <a >
-            <i class="fas fa-user-tie"></i> All Available Foods 
-        </a>
-        </li>
-        <li onClick="navigate('add_employees_div')">
-        <a href='/counter'>
-            <i class="fas fa-user-tie"></i> Counter 
-        </a>
-    </li>
+        
+       
                 <li onClick="navigate('notifications_div')">
                     <a >
                         <i class="fa fa-users fa-lg"></i> Notification <% let count = 0; for(let i=0;i<notifications.length;i++){  if( notifications[i].flag==="unread"){ count++ ;     }}  ;  if(count>0){ %>
@@ -60,7 +56,18 @@
                     </a>
                 </li>
                
-           
+                    
+            <li  onClick="navigate('employees_div')">
+            <a>
+                <i class="fas fa-users"></i>Employees
+            </a>
+        </li>
+        
+        <li onClick="navigate('add_employees_div')">
+        <a >
+            <i class="fas fa-user-tie"></i> Add Employees 
+        </a>
+        </li>
                 <li onClick="navigate('settings_div')">
                     <a  >
                         <i class="fas fa-cog"></i> Settings
@@ -184,14 +191,22 @@
 
 <!----      add_employees_div        -----------> 
  <!---       Food_div        ------>  
- <div class="row" id="add_employees_div" style="display:none">
+ <div class="row" id="food_div" style="display:none">
  <div class="col-md-12">
- <h3>  <i class="fas fa-user-tie"></i> Add Employees
+ <h3>  <i class="fas fa-user-tie"></i> All Food Items
  </h3>
  <hr>
-  <table>
-    <thead></thead>
-    <tbody></tbody>
+  <table class='table table-striped table-dark'>
+    <thead>
+    <tr><th>Food Name</th><th>Price</th><th>Picture</th></tr>
+    </thead>
+    <tbody>
+    <% foods.forEach((food)=>{ %>
+        <tr>
+        <th><%= food.name %></th><td><%= food.price %></td><td><img src='<%= food.pic %>' height='24px' /></td>
+        </tr>
+   <% }) %>
+    </tbody>
   </table>
  </div>
  </div>
@@ -235,6 +250,44 @@
 </div>
 
 <!----      add_food_div        -----------> 
+<!---       Inventory_div        ------>  
+<div class="row" id="inventory_div" style="display:none">
+<div class="col-md-12">
+<h3>  <i class="fas fa-user-tie"></i>Raw Material Inventory
+</h3>
+<hr>
+<h4>Inventory In </h4><small><div class='alert alert-info col-md-4 col-sm-6'>got some new raw material? add them</div></small>
+<div>
+ <div class='form-inline'>
+ <label class='form-control-label'>Raw Material:</label>
+ <select class='form-control' id='inventory_name'>
+ <% inventorys.forEach((inventory)=>{ %>
+  <option value='<%= inventory.name %>'> <%= inventory.name %> (<%= inventory.unit %>) </option>
+ <%}) %>
+ </select>
+ <label class='form-control-label'>Inventory Add Value:</label>
+ <input type='number' class='form-control' id='inventory_value' >
+ <button class='btn btn-dark' onClick='add_inventory()'>Add to inventory</button>
+ </div>
+</div>
+<hr>
+ <table class='table table-striped table-dark'>
+   <thead>
+   <tr><th>Name</th><th>Unit</th><th>Quantity</th></tr>
+   </thead>
+   <tbody id='inventory_table'>
+   <% inventorys.forEach((inventory)=>{ %>
+       <tr>
+       <th><%= inventory.name %></th><td><%= inventory.unit %></td><td><%= inventory.value %></td>
+       </tr>
+  <% }) %>
+   </tbody>
+ </table>
+ 
+</div>
+</div>
+ <!---       Inventory_div        ------>  
+
 
       <!---       notifications_div        ------>  
       <div class="row" id="notifications_div" style="display:none">
@@ -326,7 +379,9 @@ function pwd_change(){
 function navigate(loc){
     
     document.getElementById("add_food_div").style.display="none";
+    document.getElementById("food_div").style.display="none";
    document.getElementById("employees_div").style.display="none";
+   document.getElementById("inventory_div").style.display="none";
    document.getElementById("add_employees_div").style.display="none";
    document.getElementById("settings_div").style.display="none";
    document.getElementById("notifications_div").style.display="none";
@@ -345,6 +400,30 @@ function read(id){
     };
     xhttp.open("GET", "/notifications/read/"+id, true);
     xhttp.send(); 
+}
+function add_inventory(){
+   let name = document.getElementById('inventory_name').value, value = document.getElementById('inventory_value').value ;
+   var xhttp = new XMLHttpRequest();
+   xhttp.onreadystatechange = function() {
+     if (this.readyState == 4 && this.status == 200) {
+        console.log(this.responseText);
+        let inventory_name = JSON.parse(this.responseText).inventory.name;
+        let inventory_value = JSON.parse(this.responseText).inventory.value;
+
+        let table = document.getElementById('inventory_table');
+        let tr = table.getElementsByTagName('tr');
+        for(let i=0;i< tr.length; i++){
+            console.log(i+":"+tr[i].getElementsByTagName('th')[0].innerHTML);
+    
+            if(tr[i].getElementsByTagName('th')[0].innerHTML === inventory_name){
+                tr[i].getElementsByTagName('td')[1].innerHTML = inventory_value;
+            }
+        }
+     }
+   };
+   xhttp.open("POST", "/admin/add_inventory", true);
+   xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+   xhttp.send("name="+name+"&value="+value);
 }
 
 
