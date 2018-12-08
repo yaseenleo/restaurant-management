@@ -268,3 +268,64 @@ margin: 0%;
   font-weight: 600;
   color: white;
 }
+/* .bg-img-food{
+  background: 
+              url('../assets/food.jpg');
+  width: 100%;
+  height: auto;
+} */
+
+.bg-overlay {
+  background: linear-gradient(rgba(0,0,0,.7), rgba(0,0,0,.7)), url("../assets/food.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  color: #fff;
+  height: 900px;
+  padding-top: 50px;
+  z-index: -1;
+}
+
+.food-login-header{
+  /* margin: 0 auto; */
+  margin: 4em 0 2.5em 0;
+  color: #cdd1d6;
+}
+
+
+.food-login-sec{
+  width: 40%;
+  margin: 0 auto;
+  background-color: rgba(250, 250, 250, 0.3);
+  border-radius: 10px;
+  padding: 3em 2em;
+  height: 30em;
+  margin-top: 7em;
+}
+
+.food-btn{
+  margin-top: 1em;
+  width: 7em;
+}
+
+@media screen and (max-width:1024px) {
+  .food-login-header h1{
+    font-size: 32px;;
+  }
+
+  .food-login-sec{
+    width: 55%;
+    /* background-color: #cca45e; */
+  }
+}
+
+@media screen and (max-width:769px) {
+  .food-login-header h1{
+    font-size: 32px;;
+  }
+
+  .food-login-sec{
+    width: 60%;
+    /* background-color: #cca45e; */
+  }
+}
